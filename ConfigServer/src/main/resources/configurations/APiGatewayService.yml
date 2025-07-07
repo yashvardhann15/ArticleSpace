@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: APiGatewayService
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+
+      routes:
+        - id: USERSERVICEJWT
+          uri: lb:http://USERSERVICEJWT
+          predicates:
+          - Path=/user/**,/admin/**,/auth/google/**
+        - id: ARTICLESERVICE
+          uri: lb:http://ARTICLESERVICE
+          predicates:
+          - Path=/article/**
+
+server:
+  port: 8085
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+

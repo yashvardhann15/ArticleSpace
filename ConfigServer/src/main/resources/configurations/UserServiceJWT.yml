@@ -1,0 +1,78 @@
+#spring.application.name=UserServiceJWT
+#spring.jpa.hibernate.ddl-auto=update
+#spring.datasource.url=jdbc:mysql://localhost:3307/articlespace
+#spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+#spring.datasource.username=root
+#spring.datasource.password=rootpassword
+#spring.jpa.show-sql: true
+#server.port=8080
+#
+#spring.web.resources.add-mappings=false
+#
+#spring.data.redis.host=localhost
+#spring.data.redis.port=6379
+#
+#spring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID}
+#spring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET}
+#
+#
+#eureka.instance.hostname=localhost
+#eureka.client.service-url.defaultZone:http://localhost:8761/eureka
+##eureka.instance.non-secure-port=8080
+##spring.config.import=optional:configserver:http://localhost:8888
+#eureka.instance.instance-id=${spring.application.name}:${server.port}
+#
+#spring.kafka.producer.bootstrap-servers=localhost:9092
+#spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+#spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: UserServiceJWT
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/articlespace
+    username: root
+    password: rootpassword
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+
+  web:
+    resources:
+      add-mappings: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+eureka:
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

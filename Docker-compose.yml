@@ -1,0 +1,133 @@
+services:
+  mysql:
+    container_name: ms_mysql
+    image: mysql:8.0
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: articlespace
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 0000
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  phpmyadmin:
+    container_name: ms_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - 8083:80
+    environment:
+      PMA_HOST: ms_mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    depends_on:
+      - mysql
+    networks:
+      - microservices-net
+
+  mongodb:
+    container_name: ms_mongo_db
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo:/data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: yash
+      MONGO_INITDB_ROOT_PASSWORD: yash
+    networks:
+      - microservices-net
+
+  mongo-express:
+    container_name: ms_mongo_express
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8086:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: yash
+      ME_CONFIG_MONGODB_ADMINPASSWORD: yash
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongodb
+    networks:
+      - microservices-net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - microservices-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: ms_kafka
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+    networks:
+      - microservices-net
+    environment:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411
+    networks:
+      - microservices-net
+
+  redis:
+    container_name: ms_redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    networks:
+      - microservices-net
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  redis-commander:
+    container_name: ms_redis_commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:ms_redis:6379
+    ports:
+      - 8082:8081
+    networks:
+      - microservices-net
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+  mongo:
+  redis_data:
+  mysql_data:
